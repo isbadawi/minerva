@@ -1,2 +1,2 @@
 from common import *
-import grades
+import courses
