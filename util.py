@@ -1,5 +1,5 @@
 import functools
-def once(f):
+def cached(f):
     """
     Save the value returned by the wrapped function, so that subsequent
     calls don't perform the same computation.
