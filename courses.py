@@ -31,7 +31,7 @@ def transcript():
 def get(subject=None, title=None, grade=None, average=None, credits=None):
     matches = transcript()
     if subject is not None:
-        subject = no_whitespace(subject)
+        subject = no_whitespace(subject.lower())
         matches = [m for m in matches if subject in no_whitespace(m['subject'].lower())]
     if title is not None:
         title = title.lower()
