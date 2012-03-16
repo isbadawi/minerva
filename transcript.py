@@ -4,7 +4,7 @@ from common import browser, urls
 from util import cached
 
 _whitespace = re.compile(r'\s+')
-def no_whitespace(s):
+def _no_whitespace(s):
     return _whitespace.sub('', s)
 
 def _build_course(raw_course):
@@ -18,7 +18,7 @@ def _build_course(raw_course):
     }
 
 @cached
-def transcript():
+def _get_transcript():
     html = BeautifulSoup(browser.open(urls['transcript']))
     courses = html.find_all('td', attrs={'nowrap': ''})
     courses = [
@@ -29,10 +29,17 @@ def transcript():
     return courses
 
 def get(subject=None, title=None, grade=None, average=None, credits=None):
-    matches = transcript()
+    """
+    Query the unofficial transcript. Call with no arguments to get the 
+    whole transcript, or specify keyword arguments to narrow down the
+    results. Note that if you specify multiple keyword arguments, they are
+    ANDed together -- for OR, you should call get several times, together
+    with e.g. list.extend.
+    """
+    matches = _get_transcript()
     if subject is not None:
-        subject = no_whitespace(subject.lower())
-        matches = [m for m in matches if subject in no_whitespace(m['subject'].lower())]
+        subject = _no_whitespace(subject.lower())
+        matches = [m for m in matches if subject in _no_whitespace(m['subject'].lower())]
     if title is not None:
         title = title.lower()
         matches = [m for m in matches if title in m['title'].lower()]

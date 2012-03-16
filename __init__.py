@@ -1,2 +1,2 @@
 from common import *
-import courses
+import transcript
