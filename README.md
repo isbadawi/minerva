@@ -20,14 +20,17 @@ transcript.
     >>> courses = mcgill.transcript.get()
     >>> import pprint
     >>> pprint.pprint(courses)
-    [{'average': u'B',
-      'credits': 3,
-      'grade': u'A',
-      'section': u'001',
-      'subject': u'COMP 250',
-      'title': u'Intro to Computer Science'},
-    ... snip ...
-    ]
+    [{'courses': [{'average': u'B',
+                   'credits': 3,
+                   'grade': u'A',
+                   'section': u'001',
+                   'subject': u'COMP 250',
+                   'title': u'Intro to Computer Science'},
+                   ... snip ...],
+      'cum_gpa': u'3.88',
+      'gpa': u'3.88',
+      'semester': u'Fall 2009'},
+      ... snip ...]
 
 `get()` takes a few keyword arguments to narrow down the results. For
 instance, what if I wanted a list of all MATH courses in which I got an A?
