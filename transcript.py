@@ -51,7 +51,7 @@ def _get_transcript():
         })
     return transcript
 
-def get(subject=None, title=None, grade=None, average=None, credits=None):
+def get(**kwargs):
     """
     Query the unofficial transcript. Call with no arguments to get the 
     whole transcript, or specify keyword arguments to narrow down the
@@ -60,18 +60,28 @@ def get(subject=None, title=None, grade=None, average=None, credits=None):
     with e.g. list.extend.
     """
     matches = _get_transcript()
+    semester = kwargs.get('semester', None)
+    if semester is not None:
+        matches = next(m['courses'] for m in matches if m['semester'] == semester)
+    elif kwargs:
+        matches = sum((m['courses'] for m in matches), [])
+    subject = kwargs.get('subject', None)
     if subject is not None:
         subject = _no_whitespace(subject.lower())
         matches = [m for m in matches if subject in _no_whitespace(m['subject'].lower())]
+    title = kwargs.get('title', None)
     if title is not None:
         title = title.lower()
         matches = [m for m in matches if title in m['title'].lower()]
+    grade = kwargs.get('grade', None)
     if grade is not None:
         grade = grade.lower()
         matches = [m for m in matches if m['grade'] is not None and grade == m['grade'].lower()]
+    average = kwargs.get('average', None)
     if average is not None:
         average = average.lower()
         matches = [m for m in matches if m['average'] is not None and average == m['average'].lower()]
+    credits = kwargs.get('credits', None)
     if credits is not None:
         credits = int(credits, 10)
         matches = [m for m in matches if credits == m['credits']]
