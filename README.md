@@ -56,4 +56,4 @@ course...
       'grade': None, 
       'section': u'001'
       'subject': u'COMP 521',
-      title: u'Modern Computer Games'}]
+      'title': u'Modern Computer Games'}]
