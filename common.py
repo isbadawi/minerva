@@ -1,7 +1,7 @@
 import mechanize
 import os
 
-class McGillException(Exception):
+class error(Exception):
     pass
 
 urls = {
@@ -19,11 +19,11 @@ def login(sid=None, pin=None):
     if pin is None:
         pin = os.environ.get('MCGILL_PIN', None)
     if sid is None or pin is None:
-        raise McGillException('McGill ID or PIN not provided.')
+        raise error('McGill ID or PIN not provided.')
     browser.open(urls['login'])
     browser.select_form('loginform')
     browser['sid'] = sid
     browser['PIN'] = pin
     response = browser.submit()
     if 'Authorization Failure' in response.read():
-        raise McGillException('Invalid McGill ID or PIN.')
+        raise error('Invalid McGill ID or PIN.')
