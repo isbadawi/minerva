@@ -1,6 +1,8 @@
 import mechanize
 import os
 
+import transcript
+
 class error(Exception):
     pass
 
@@ -11,7 +13,18 @@ urls = {
 _base_url = 'https://banweb.mcgill.ca/pban1/%s'
 urls = {k: _base_url % v for k,v in urls.items()}
 
-browser = mechanize.Browser()
+class McGillClient(object):
+    def __init__(self, sid, browser):
+        self.sid = sid
+        self.browser = browser
+
+    def __repr__(self):
+        return '<McGillClient: %s>' % self.sid
+
+    @property
+    def transcript(self):
+        raw_transcript = self.browser.open(urls['transcript'])
+        return transcript.scrape(raw_transcript)
 
 def login(sid=None, pin=None):
     if sid is None:
@@ -20,6 +33,7 @@ def login(sid=None, pin=None):
         pin = os.environ.get('MCGILL_PIN', None)
     if sid is None or pin is None:
         raise error('McGill ID or PIN not provided.')
+    browser = mechanize.Browser()
     browser.open(urls['login'])
     browser.select_form('loginform')
     browser['sid'] = sid
@@ -27,3 +41,4 @@ def login(sid=None, pin=None):
     response = browser.submit()
     if 'Authorization Failure' in response.read():
         raise error('Invalid McGill ID or PIN.')
+    return McGillClient(sid, browser)
