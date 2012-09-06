@@ -1,7 +1,6 @@
 import re
 from bs4 import BeautifulSoup
 from common import browser, urls
-from util import cached
 
 _whitespace = re.compile(r'\s+')
 def _no_whitespace(s):
@@ -17,7 +16,6 @@ def _build_course(raw_course):
         'average': raw_course[10] if raw_course[10] != u'\xa0' else None,
     }
 
-@cached
 def _get_transcript():
     _semester = re.compile('(Fall|Winter|Summer)')
     def _semester_or_course(tag):
