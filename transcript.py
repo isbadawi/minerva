@@ -80,7 +80,7 @@ def scrape(html):
 
     html = BeautifulSoup(html)
     all_courses = html.find_all(_semester_or_course)
-    semesters = [t.parent for t in html.find_all(text=_semester)][2:]
+    semesters = [t.parent for t in html.find_all(text=_semester)][1:]
     indices = [all_courses.index(t) for t in semesters]
     term_gpas = [t.parent.parent.next_sibling.next_sibling.span.text 
                 for t in html.find_all(text="TERM GPA:")]
