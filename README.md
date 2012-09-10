@@ -32,3 +32,13 @@ courses in which I got an A:
     >>> pprint.pprint(courses)
     [<Course: MATH 235 - Algebra 1>,
      <Course: MATH 318 - Mathematical Logic>]
+
+Some useful bits:
+
+    # What grade did I get in MATH317?
+    >>> transcript.get_courses(subject='MATH317')[0].grade
+    u'A'
+
+    # Has the grade for COMP762 been posted yet?
+    >>> transcript.get_courses(subject='COMP762')[0].grade is not None
+    False

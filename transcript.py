@@ -1,10 +1,6 @@
 import re
 from bs4 import BeautifulSoup
 
-_whitespace = re.compile(r'\s+')
-def _clean(s):
-    return _whitespace.sub('', s.lower())
-
 class Transcript(object):
     @classmethod
     def from_html(cls, html):
@@ -62,15 +58,19 @@ class Course(object):
     def __repr__(self):
         return '<Course: %s - %s>' % (self.subject, self.title)
 
+_whitespace = re.compile(r'\s+')
+def _clean(s):
+    return _whitespace.sub('', s.lower())
+
 def _build_course(raw_course):
-    return Course(**{
-        'subject': raw_course[1],
-        'section': raw_course[2],
-        'title': raw_course[3],
-        'credits': int(raw_course[4]),
-        'grade': raw_course[6] if raw_course[6] != u'\xa0' else None,
-        'average': raw_course[10] if raw_course[10] != u'\xa0' else None,
-    })
+    return Course(
+        subject=raw_course[1],
+        section=raw_course[2],
+        title=raw_course[3],
+        credits=int(raw_course[4]),
+        grade=raw_course[6] if raw_course[6] != u'\xa0' else None,
+        average=raw_course[10] if raw_course[10] != u'\xa0' else None,
+    )
 
 def scrape(html):
     _semester = re.compile('(Fall|Winter|Summer)')
@@ -97,10 +97,6 @@ def scrape(html):
         courses = [_build_course(c) for c in courses]
         gpa = term_gpas[i] if i < len(term_gpas) else None
         cum_gpa = cum_gpas[i] if i < len(cum_gpas) else None
-        transcript.append(Term(**{
-            'semester': semester,
-            'courses': courses,
-            'gpa': gpa,
-            'cum_gpa': cum_gpa,
-        }))
+        transcript.append(Term(semester=semester, courses=courses,
+                               gpa=gpa, cum_gpa=cum_gpa))
     return Transcript(transcript)
