@@ -13,11 +13,11 @@ class Transcript(object):
     def __init__(self, terms):
         self.terms = {term.semester: term for term in terms}
 
-    def courses_with(self, **kwargs):
+    def get_courses(self, **kwargs):
         semester = kwargs.pop('semester', None)
         if semester is not None:
-            return self.terms[semester].courses_with(**kwargs)
-        return sum((term.courses_with(**kwargs)
+            return self.terms[semester].get_courses(**kwargs)
+        return sum((term.get_courses(**kwargs)
                     for term in self.terms.values()), [])
 
 class Term(object):
@@ -30,7 +30,7 @@ class Term(object):
     def __repr__(self):
         return '<Term: %s>' % self.semester
 
-    def courses_with(self, subject=None, title=None, grade=None,
+    def get_courses(self, subject=None, title=None, grade=None,
                      average=None, credits=None):
         matches = self.courses
         if subject is not None:
