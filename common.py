@@ -10,7 +10,7 @@ urls = {
     'login': 'twbkwbis.P_WWWLogin',
     'transcript': 'bzsktran.P_Display_Form?user_type=S&tran_type=V'
 }
-_base_url = 'https://banweb.mcgill.ca/pban1/%s'
+_base_url = 'https://horizon.mcgill.ca/pban1/%s'
 urls = {k: _base_url % v for k,v in urls.items()}
 
 class McGillClient(object):
