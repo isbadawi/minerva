@@ -50,17 +50,6 @@ class Course(object):
                 (credits is None or int(credits, 10) == self.credits))
 
 
-def _build_course(raw_course):
-    return Course(
-        subject=raw_course[1],
-        section=raw_course[2],
-        title=raw_course[3],
-        credits=int(raw_course[4]),
-        grade=raw_course[6] if raw_course[6] != u'\xa0' else None,
-        average=raw_course[10] if raw_course[10] != u'\xa0' else None,
-    )
-
-
 def _semester_or_course(tag):
     terms = ['Fall', 'Winter', 'Summer']
     return ((tag.name == 'td' and tag.has_attr('nowrap')) or
@@ -85,7 +74,11 @@ def scrape(html):
             [t.get_text() for t in all_courses[j:j+11] if t.get_text()]
             for j in range(index+1, next, 11)
         ]
-        courses = [_build_course(c) for c in courses]
+        courses = [Course(subject=c[1], section=c[2], title=c[3],
+                          credits=int(c[4]),
+                          grade=c[6] if c[6] != u'\xa0' else None,
+                          average=c[10] if c[10] != u'\xa0' else None)
+                   for c in courses]
         gpa = term_gpas[i] if i < len(term_gpas) else None
         cum_gpa = cum_gpas[i] if i < len(cum_gpas) else None
         transcript.append(Term(semester=semester, courses=courses,
