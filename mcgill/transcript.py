@@ -1,5 +1,3 @@
-import re
-
 import bs4
 
 
@@ -50,17 +48,18 @@ class Course(object):
                 (credits is None or int(credits, 10) == self.credits))
 
 
-def _semester_or_course(tag):
-    terms = ['Fall', 'Winter', 'Summer']
-    return ((tag.name == 'td' and tag.has_attr('nowrap')) or
-            (tag.name == 'b' and any(tag.text.startswith(t) for t in terms)))
-
-
 def scrape(html):
+    terms = ['Fall', 'Winter', 'Summer']
+
+    def is_semester(tag):
+        return tag.name == 'b' and any(tag.text.startswith(t) for t in terms)
+
+    def is_course(tag):
+        return tag.name == 'td' and tag.has_attr('nowrap')
+
     html = bs4.BeautifulSoup(html)
-    all_courses = html.find_all(_semester_or_course)
-    semester = re.compile(r'(Fall|Winter|Summer)')
-    semesters = [t.parent for t in html.find_all(text=semester)][1:]
+    all_courses = html.find_all(lambda tag: semester(tag) or course(tag))
+    semesters = html.find_all(semester)
     indices = [all_courses.index(t) for t in semesters]
     term_gpas = [t.parent.parent.next_sibling.next_sibling.span.text
                  for t in html.find_all(text="TERM GPA:")]
