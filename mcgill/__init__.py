@@ -1,2 +1,1 @@
-from common import *
-import transcript
+from .common import *

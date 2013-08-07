@@ -1,11 +1,8 @@
 import re
-from bs4 import BeautifulSoup
+
+import bs4
 
 class Transcript(object):
-    @classmethod
-    def from_html(cls, html):
-        return scrape(html)
-
     def __init__(self, terms):
         self.terms = {term.semester: term for term in terms}
 
@@ -78,7 +75,7 @@ def scrape(html):
         return ((tag.name == 'td' and tag.has_key('nowrap')) or
                 (tag.name == 'b' and _semester.match(tag.text)))
 
-    html = BeautifulSoup(html)
+    html = bs4.BeautifulSoup(html)
     all_courses = html.find_all(_semester_or_course)
     semesters = [t.parent for t in html.find_all(text=_semester)][1:]
     indices = [all_courses.index(t) for t in semesters]

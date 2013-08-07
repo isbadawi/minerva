@@ -1,7 +1,7 @@
 import mechanize
 import os
 
-from transcript import Transcript
+from . import transcript
 
 class error(Exception):
     pass
@@ -24,7 +24,7 @@ class McGillClient(object):
     @property
     def transcript(self):
         raw_transcript = self.browser.open(urls['transcript'])
-        return Transcript.from_html(raw_transcript)
+        return transcript.scrape(raw_transcript)
 
 def login(sid=None, pin=None):
     if sid is None:
