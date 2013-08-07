@@ -58,8 +58,8 @@ def scrape(html):
         return tag.name == 'td' and tag.has_attr('nowrap')
 
     html = bs4.BeautifulSoup(html)
-    all_courses = html.find_all(lambda tag: semester(tag) or course(tag))
-    semesters = html.find_all(semester)
+    all_courses = html.find_all(lambda tag: is_semester(tag) or is_course(tag))
+    semesters = html.find_all(is_semester)
     indices = [all_courses.index(t) for t in semesters]
     term_gpas = [t.parent.parent.next_sibling.next_sibling.span.text
                  for t in html.find_all(text="TERM GPA:")]
