@@ -2,6 +2,9 @@ import re
 
 import bs4
 
+_WHITESPACE_REGEX = re.compile(r'\s+')
+
+
 class Transcript(object):
     def __init__(self, terms):
         self.terms = {term.semester: term for term in terms}
@@ -12,6 +15,7 @@ class Transcript(object):
             return self.terms[semester].get_courses(**kwargs)
         return sum((term.get_courses(**kwargs)
                     for term in self.terms.values()), [])
+
 
 class Term(object):
     def __init__(self, courses, cum_gpa, gpa, semester):
@@ -24,7 +28,7 @@ class Term(object):
         return '<Term: %s>' % self.semester
 
     def get_courses(self, subject=None, title=None, grade=None,
-                     average=None, credits=None):
+                    average=None, credits=None):
         matches = self.courses
         if subject is not None:
             subject = _clean(subject)
@@ -43,6 +47,7 @@ class Term(object):
             matches = [m for m in matches if credits == m.credits]
         return matches
 
+
 class Course(object):
     def __init__(self, average, credits, grade, section, subject, title):
         self.average = average
@@ -55,9 +60,10 @@ class Course(object):
     def __repr__(self):
         return '<Course: %s - %s>' % (self.subject, self.title)
 
-_whitespace = re.compile(r'\s+')
+
 def _clean(s):
-    return _whitespace.sub('', s.lower())
+    return _WHITESPACE_REGEX.sub('', s.lower())
+
 
 def _build_course(raw_course):
     return Course(
@@ -69,19 +75,22 @@ def _build_course(raw_course):
         average=raw_course[10] if raw_course[10] != u'\xa0' else None,
     )
 
-def scrape(html):
-    _semester = re.compile('(Fall|Winter|Summer)')
-    def _semester_or_course(tag):
-        return ((tag.name == 'td' and tag.has_key('nowrap')) or
-                (tag.name == 'b' and _semester.match(tag.text)))
 
+def _semester_or_course(tag):
+    terms = ['Fall', 'Winter', 'Summer']
+    return ((tag.name == 'td' and tag.has_attr('nowrap')) or
+            (tag.name == 'b' and any(tag.text.startswith(t) for t in terms)))
+
+
+def scrape(html):
     html = bs4.BeautifulSoup(html)
     all_courses = html.find_all(_semester_or_course)
-    semesters = [t.parent for t in html.find_all(text=_semester)][1:]
+    semester = re.compile(r'(Fall|Winter|Summer)')
+    semesters = [t.parent for t in html.find_all(text=semester)][1:]
     indices = [all_courses.index(t) for t in semesters]
-    term_gpas = [t.parent.parent.next_sibling.next_sibling.span.text 
-                for t in html.find_all(text="TERM GPA:")]
-    cum_gpas = [t.parent.parent.next_sibling.next_sibling.span.text 
+    term_gpas = [t.parent.parent.next_sibling.next_sibling.span.text
+                 for t in html.find_all(text="TERM GPA:")]
+    cum_gpas = [t.parent.parent.next_sibling.next_sibling.span.text
                 for t in html.find_all(text="CUM GPA:")]
     transcript = []
     for i, (index, semester) in enumerate(zip(indices, semesters)):

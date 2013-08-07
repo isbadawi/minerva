@@ -3,6 +3,7 @@ import os
 
 from . import transcript
 
+
 class error(Exception):
     pass
 
@@ -11,7 +12,8 @@ urls = {
     'transcript': 'bzsktran.P_Display_Form?user_type=S&tran_type=V'
 }
 _base_url = 'https://horizon.mcgill.ca/pban1/%s'
-urls = {k: _base_url % v for k,v in urls.items()}
+urls = {k: _base_url % v for k, v in urls.items()}
+
 
 class McGillClient(object):
     def __init__(self, sid, browser):
@@ -25,6 +27,7 @@ class McGillClient(object):
     def transcript(self):
         raw_transcript = self.browser.open(urls['transcript'])
         return transcript.scrape(raw_transcript)
+
 
 def login(sid=None, pin=None):
     if sid is None:
