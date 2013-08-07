@@ -2,8 +2,6 @@ import re
 
 import bs4
 
-_WHITESPACE_REGEX = re.compile(r'\s+')
-
 
 class Transcript(object):
     def __init__(self, terms):
@@ -27,25 +25,8 @@ class Term(object):
     def __repr__(self):
         return '<Term: %s>' % self.semester
 
-    def get_courses(self, subject=None, title=None, grade=None,
-                    average=None, credits=None):
-        matches = self.courses
-        if subject is not None:
-            subject = _clean(subject)
-            matches = [m for m in matches if subject in _clean(m.subject)]
-        if title is not None:
-            title = title.lower()
-            matches = [m for m in matches if title in m.title.lower()]
-        if grade is not None:
-            grade = grade.upper()
-            matches = [m for m in matches if grade == m.grade]
-        if average is not None:
-            average = average.upper()
-            matches = [m for m in matches if average == m.average]
-        if credits is not None:
-            credits = int(credits, 10)
-            matches = [m for m in matches if credits == m.credits]
-        return matches
+    def get_courses(self, **kwargs):
+        return [course for course in self.courses if course.matches(**kwargs)]
 
 
 class Course(object):
@@ -60,9 +41,13 @@ class Course(object):
     def __repr__(self):
         return '<Course: %s - %s>' % (self.subject, self.title)
 
-
-def _clean(s):
-    return _WHITESPACE_REGEX.sub('', s.lower())
+    def matches(self, subject='', title='', grade='',
+                average='', credits=None):
+        return (subject.lstrip().lower() in self.subject.lstrip().lower() and
+                title.lower() in self.title.lower() and
+                (not grade or grade.upper() == self.grade) and
+                (not average or average.upper() == self.average) and
+                (credits is None or int(credits, 10) == self.credits))
 
 
 def _build_course(raw_course):
