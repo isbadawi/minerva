@@ -4,7 +4,7 @@ import getpass
 import sys
 import StringIO
 
-import mcgill
+import minerva
 
 
 def parse_args():
@@ -64,7 +64,7 @@ def format_transcript(transcript):
 
 def main():
     username, password = get_user_credentials()
-    client = mcgill.login(username, password)
+    client = minerva.login(username, password)
     transcript = client.transcript()
     print format_transcript(transcript)
 

@@ -1,5 +1,5 @@
-python-mcgill
-=============
+minerva
+=======
 
 This is a little python library that makes it easier for McGill
 students to programmatically access information from Minerva. As of this
@@ -10,8 +10,8 @@ Minerva. You can pass these in to the `login()` function, or set the
 `MCGILL_SID` and `MCGILL_PIN` environment variables (you still need to call
 `login()` if you do this).
 
-    >>> import mcgill
-    >>> isbadawi = mcgill.login()
+    >>> import minerva
+    >>> isbadawi = minerva.login()
 
 This retrieves your unofficial transcript.
 
