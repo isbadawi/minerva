@@ -15,13 +15,13 @@ _base_url = 'https://horizon.mcgill.ca/pban1/%s'
 urls = {k: _base_url % v for k, v in urls.items()}
 
 
-class McGillClient(object):
+class MinervaClient(object):
     def __init__(self, sid, browser):
         self.sid = sid
         self.browser = browser
 
     def __repr__(self):
-        return '<McGillClient: %s>' % self.sid
+        return '<MinervaClient: %s>' % self.sid
 
     def transcript(self):
         raw_transcript = self.browser.open(urls['transcript'])
@@ -30,9 +30,9 @@ class McGillClient(object):
 
 def login(sid=None, pin=None):
     if sid is None:
-        sid = os.environ.get('MCGILL_SID', None)
+        sid = os.environ.get('MINERVA_USER', None)
     if pin is None:
-        pin = os.environ.get('MCGILL_PIN', None)
+        pin = os.environ.get('MINERVA_PASS', None)
     if sid is None or pin is None:
         raise error('McGill ID or PIN not provided.')
     browser = mechanize.Browser()
@@ -43,4 +43,4 @@ def login(sid=None, pin=None):
     response = browser.submit()
     if 'Authorization Failure' in response.read():
         raise error('Invalid McGill ID or PIN.')
-    return McGillClient(sid, browser)
+    return MinervaClient(sid, browser)

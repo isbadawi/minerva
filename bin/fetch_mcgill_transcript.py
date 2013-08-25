@@ -14,7 +14,7 @@ def parse_args():
     parser.add_argument('-a', '--auth', help='''email:password or sid:pin
 If the password (or pin) is omitted, will prompt for them.
 If the argument is omitted altogether, will look to the values of the
-MCGILL_SID and MCGILL_PIN environment variables.
+MINERVA_USER and MINERVA_PASS environment variables.
 ''')
     return parser.parse_args()
 

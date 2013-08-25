@@ -7,7 +7,7 @@ writing, it only supports retrieving unofficial transcript information.
 
 You need a McGill ID and PIN (or McGill email and password) to access
 Minerva. You can pass these in to the `login()` function, or set the
-`MCGILL_SID` and `MCGILL_PIN` environment variables (you still need to call
+`MINERVA_USER` and `MINERVA_PASS` environment variables (you still need to call
 `login()` if you do this).
 
     >>> import minerva
