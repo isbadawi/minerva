@@ -64,4 +64,4 @@ $ pip install mcgill-minerva
 
 Note that one of the requirements is `lxml`, whose installation is sometimes
 troublesome because it depends on `libxml` and `libxslt`. For more detailed
-instructions regarding this, refer to [the `lxml` website](http://lxml.de/installation.html)
+instructions regarding this, refer to [the `lxml` website](http://lxml.de/installation.html).
