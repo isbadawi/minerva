@@ -23,7 +23,6 @@ class McGillClient(object):
     def __repr__(self):
         return '<McGillClient: %s>' % self.sid
 
-    @property
     def transcript(self):
         raw_transcript = self.browser.open(urls['transcript'])
         return transcript.scrape(raw_transcript)

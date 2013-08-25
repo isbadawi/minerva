@@ -15,7 +15,7 @@ Minerva. You can pass these in to the `login()` function, or set the
 
 This retrieves your unofficial transcript.
 
-    >>> transcript = isbadawi.transcript
+    >>> transcript = isbadawi.transcript()
     >>> import pprint
     >>> pprint.pprint(transcript.get_courses())
     [<Course: COMP 531 - Advanced Theory of Computation>,
