@@ -11,26 +11,28 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description='fetch McGill transcript',
         formatter_class=argparse.RawTextHelpFormatter)
-    parser.add_argument('-a', '--auth', help='''email:password or sid:pin
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('-u', '--from_user', help='''email:password or sid:pin
 If the password (or pin) is omitted, will prompt for them.
 If the argument is omitted altogether, will look to the values of the
 MINERVA_USER and MINERVA_PASS environment variables.
 ''')
+    group.add_argument('-f', '--from_file', help='''Read the transcript html
+from this file instead of fetching it.''')
     return parser.parse_args()
 
 
-def get_user_credentials():
-    args = parse_args()
-    if args.auth is None:
+def get_user_credentials(auth):
+    if auth is None:
         return None, None
-    if ':' in args.auth:
-        return args.auth.split(':', 1)
+    if ':' in auth:
+        return auth.split(':', 1)
     try:
-        password = getpass.getpass("Password for %s: " % args.auth)
+        password = getpass.getpass("Password for %s: " % auth)
     except (EOFError, KeyboardInterrupt):
         sys.stderr.write('\n')
         sys.exit(0)
-    return args.auth, password
+    return auth, password
 
 
 def format_table(table):
@@ -77,9 +79,14 @@ def format_transcript(transcript):
 
 
 def main():
-    username, password = get_user_credentials()
-    client = minerva.login(username, password)
-    transcript = client.transcript()
+    args = parse_args()
+    if args.from_file:
+        with open(args.from_file, 'r') as f:
+            transcript = minerva.transcript.scrape(f.read())
+    else:
+        username, password = get_user_credentials(args.from_user)
+        client = minerva.login(username, password)
+        transcript = client.transcript()
     print format_transcript(transcript)
 
 if __name__ == '__main__':
