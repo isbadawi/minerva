@@ -1,3 +1,5 @@
+import itertools
+
 import bs4
 
 
@@ -45,7 +47,7 @@ class Course(object):
                 title.lower() in self.title.lower() and
                 (not grade or grade.upper() == self.grade) and
                 (not average or average.upper() == self.average) and
-                (credits is None or int(credits, 10) == self.credits))
+                (credits is None or abs(credits - self.credits) < 0.001))
 
 
 def scrape(html):
@@ -55,31 +57,42 @@ def scrape(html):
         return tag.name == 'b' and any(tag.text.startswith(t) for t in terms)
 
     def is_course(tag):
-        return tag.name == 'td' and tag.has_attr('nowrap')
+        return (tag.name == 'tr' and any(
+            hasattr(c, 'name') and c.name == 'td' and c.has_attr('nowrap')
+            for c in tag.children))
 
     html = bs4.BeautifulSoup(html)
-    all_courses = html.find_all(lambda tag: is_semester(tag) or is_course(tag))
-    semesters = html.find_all(is_semester)
-    indices = [all_courses.index(t) for t in semesters]
+    tags = html.find_all(lambda tag: is_semester(tag) or is_course(tag))
+    semesters = [i for i, tag in enumerate(tags) if is_semester(tag)]
     term_gpas = [t.parent.parent.next_sibling.next_sibling.span.text
                  for t in html.find_all(text="TERM GPA:")]
     cum_gpas = [t.parent.parent.next_sibling.next_sibling.span.text
                 for t in html.find_all(text="CUM GPA:")]
     transcript = []
-    for i, (index, semester) in enumerate(zip(indices, semesters)):
-        semester = semester.text.replace(u'\xa0', u' ')
-        next = indices[i+1] if i < len(indices) - 1 else len(all_courses)
-        courses = [
-            [t.get_text() for t in all_courses[j:j+11] if t.get_text()]
-            for j in range(index+1, next, 11)
-        ]
-        courses = [Course(subject=c[1], section=c[2], title=c[3],
-                          credits=int(c[4]),
-                          grade=c[6] if c[6] != u'\xa0' else None,
-                          average=c[10] if c[10] != u'\xa0' else None)
-                   for c in courses]
+    for i, index in enumerate(semesters):
+        semester = tags[index].text.replace(u'\xa0', u' ')
         gpa = term_gpas[i] if i < len(term_gpas) else None
         cum_gpa = cum_gpas[i] if i < len(cum_gpas) else None
+        raw_courses = [
+            [t.get_text() for t in tag.find_all('td') if t.get_text()]
+            for tag in itertools.takewhile(is_course, tags[index + 1:])
+        ]
+        courses = []
+        just_saw_k = False
+        for c in raw_courses:
+            if just_saw_k:
+                courses[-1].grade += ' (%s)' % c[6]
+                just_saw_k = False
+                continue
+            course = Course(
+                subject=c[1].encode('ascii', errors='ignore'),
+                section=c[2].encode('utf-8'),
+                title=c[3].encode('utf-8'),
+                credits=float(c[4]),
+                grade=c[6].encode('utf-8') if c[6] != u'\xa0' else None,
+                average=c[10].encode('utf-8') if c[10] != u'\xa0' else None)
+            courses.append(course)
+            just_saw_k = course.grade == 'K'
         transcript.append(Term(semester=semester, courses=courses,
                                gpa=gpa, cum_gpa=cum_gpa))
     return Transcript(transcript)

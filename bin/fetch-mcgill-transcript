@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import argparse
 import getpass
+import io
 import sys
-import StringIO
 
 import minerva
 
@@ -50,13 +50,13 @@ def format_table(table):
         if isinstance(row, list):
             for i, column in enumerate(row):
                 widths[i] = max(len(column), widths[i])
-    buf = StringIO.StringIO()
+    buf = io.StringIO()
     for row in table:
         if isinstance(row, list):
             line = '\t'.join(c.ljust(w) for c, w in zip(row, widths))
-            buf.write('\t%s\n' % line)
+            buf.write(u'\t%s\n' % line.decode('utf-8'))
         else:
-            buf.write('%s\n' % row)
+            buf.write(u'%s\n' % row)
     return buf.getvalue()
 
 
@@ -72,7 +72,9 @@ def format_transcript(transcript):
             header += ' (GPA: %s, cumulative: %s)' % (term.gpa, term.cum_gpa)
         table.append(header)
         table.extend([
-            course.subject, course.title, str(course.credits),
+            course.subject, course.title,
+            str(int(course.credits) if int(course.credits) == course.credits
+                                    else course.credits),
             course.grade or '', course.average or '',
         ] for course in term.courses)
     return format_table(table)
