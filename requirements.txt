@@ -1,4 +1,4 @@
 beautifulsoup4==4.0.1
 lxml==3.2.3
-requests==1.2.3
+requests==2.20.0
 wsgiref==0.1.2
